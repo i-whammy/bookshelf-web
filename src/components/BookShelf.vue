@@ -5,13 +5,26 @@
 </template>
 
 <script lang="ts">
-import Vue, { Component } from 'vue'
+import Vue from 'vue'
 import BookRecord from '@/domain/BookRecord'
+import axios from 'axios'
+import Component from 'vue-class-component'
 
+@Component
 export default class BookShelf extends Vue {
-  private bookRecords: Array<BookRecord> = [new BookRecord(new Date(2020, 1, 1), 'Domain-Driven Design', 'Eric Evans'),
-    new BookRecord(new Date(2020, 1, 1), 'Domain-Driven Design2', 'Eric Evans'),
-    new BookRecord(new Date(2020, 1, 1), 'Domain-Driven Design3', 'Eric Evans')];
+  private bookRecords: Array<BookRecord> = [new BookRecord(new Date(2020, 1, 1), 'This is a sample record.', 'Mr. X')];
+
+  private records = []
+
+  async mounted () {
+    const record = await axios.get('http://localhost:16000/v1/records').then(
+      function (response) {
+        const first = response.data[0]
+        return new BookRecord(new Date(first.startReadingDate[0], first.startReadingDate[1] - 1, first.startReadingDate[2]), first.title, first.authorName)
+      }
+    )
+    this.bookRecords.push(record)
+  }
 }
 </script>
 
